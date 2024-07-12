@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 import random
+import winsound
+import threading
 
 # Global variables to store the generated array and delay time
 generated_data = []
@@ -8,7 +10,17 @@ delay_time = 1
 
 # Function to generate the array based on max value
 def generate_array():
-    max_value = int(max_entry.get())
+    try:
+        max_value = int(max_entry.get())
+        if not 3 <= max_value <= 1000:
+            max_value = 100
+            max_entry.delete(0, tk.END)
+            max_entry.insert(0, str(max_value))
+    except ValueError:
+        max_value = 100
+        max_entry.delete(0, tk.END)
+        max_entry.insert(0, str(max_value))
+
     global generated_data
     generated_data = list(range(1, max_value + 1))  # Include max_value in the list
     print(f"Generated Array: {generated_data}")
@@ -56,7 +68,7 @@ def selection_sort(data):
     n = len(data)
     for i in range(n):
         min_idx = i
-        for j in range(i+1, n):
+        for j in range(i + 1, n):
             yield data, min_idx, j  # Yield the data and the indices being compared
             if data[j] < data[min_idx]:
                 min_idx = j
@@ -78,6 +90,46 @@ def insertion_sort(data):
         data[j + 1] = key
         yield data, j + 1, i  # Yield after placing the key
 
+# Gnome sort algorithm with step-by-step yield
+def gnome_sort(data):
+    index = 0
+    n = len(data)
+    while index < n:
+        if index == 0:
+            index += 1
+        if data[index] >= data[index - 1]:
+            index += 1
+        else:
+            data[index], data[index - 1] = data[index - 1], data[index]
+            yield data, index, index - 1  # Yield the data and the indices being compared
+            index -= 1
+
+# Cocktail shaker sort algorithm with step-by-step yield
+def cocktail_shaker_sort(data):
+    n = len(data)
+    swapped = True
+    start = 0
+    end = n - 1
+    while swapped:
+        swapped = False
+        for i in range(start, end):
+            yield data, i, i + 1  # Yield the data and the indices being compared
+            if data[i] > data[i + 1]:
+                data[i], data[i + 1] = data[i + 1], data[i]
+                swapped = True
+                yield data, i, i + 1  # Yield again after the swap
+        if not swapped:
+            break
+        swapped = False
+        end -= 1
+        for i in range(end - 1, start - 1, -1):
+            yield data, i, i + 1  # Yield the data and the indices being compared
+            if data[i] > data[i + 1]:
+                data[i], data[i + 1] = data[i + 1], data[i]
+                swapped = True
+                yield data, i, i + 1  # Yield again after the swap
+        start += 1
+
 # Function to handle the run button click
 def run_algorithm():
     selected_algorithm = algorithm_var.get()
@@ -92,10 +144,28 @@ def run_algorithm():
 def animate_sort(sorting_generator):
     try:
         next_data, index1, index2 = next(sorting_generator)
+        threading.Thread(target=play_sound, args=(generated_data[index1], generated_data[index2])).start()
         draw_bars(index1, index2)
         root.after(delay_time, lambda: animate_sort(sorting_generator))
     except StopIteration:
         draw_bars()  # Draw final state with no highlighted bars
+
+# Function to play sound based on bar values
+def play_sound(value1, value2):
+    def get_frequency(value):
+        min_freq = 120
+        max_freq = 1212
+        min_value = min(generated_data)
+        max_value = max(generated_data)
+        return min_freq + (value - min_value) * (max_freq - min_value) / (max_value - min_value)
+
+    freq1 = get_frequency(value1)
+    freq2 = get_frequency(value2)
+    duration = 200  # Duration for audible sound in milliseconds
+
+    # Play two frequencies consecutively
+    winsound.Beep(int(freq1), duration)
+    winsound.Beep(int(freq2), duration)
 
 # Function to update the delay time
 def update_delay(value):
@@ -117,12 +187,23 @@ def reverse_array():
     print(f"Reversed Array: {generated_data}")
     draw_bars()
 
+# Function to reset the program to its original state
+def reset_program():
+    global generated_data
+    generated_data = []
+    max_entry.delete(0, tk.END)
+    draw_bars()
+    print("Program has been reset")
+
 # Function to draw bars on the canvas
 def draw_bars(index1=None, index2=None):
     canvas.delete("all")
     canvas_width = canvas.winfo_width()
     canvas_height = canvas.winfo_height()
-    bar_width = canvas_width / len(generated_data)
+    if generated_data:
+        bar_width = canvas_width / len(generated_data)
+    else:
+        bar_width = canvas_width
 
     for i, value in enumerate(generated_data):
         x0 = i * bar_width
@@ -137,6 +218,12 @@ root = tk.Tk()
 root.title("Algorithm Visualizer")
 root.geometry("800x600")
 
+# Configure the grid layout
+root.grid_columnconfigure(0, weight=3)
+root.grid_columnconfigure(1, weight=1)
+root.grid_rowconfigure(0, weight=1)
+root.grid_rowconfigure(1, weight=0)
+
 # Create a frame for the view window
 view_frame = tk.Frame(root, width=600, height=600, bg="dark grey")
 view_frame.grid(row=0, column=0, rowspan=2, sticky="nsew")
@@ -150,7 +237,7 @@ settings_frame = tk.Frame(root, width=200, height=600)
 settings_frame.grid(row=0, column=1, sticky="n")
 
 # Create and place the max value label and entry
-max_label = tk.Label(settings_frame, text="Max Value:")
+max_label = tk.Label(settings_frame, text="Max Value (3-1000):")
 max_label.pack(pady=5)
 max_entry = tk.Entry(settings_frame)
 max_entry.pack(pady=5)
@@ -170,7 +257,7 @@ algorithm_label.pack(pady=5)
 # Create and place the algorithm selection dropdown
 algorithm_var = tk.StringVar(settings_frame)
 algorithm_var.set("bubble_sort")  # default value
-algorithm_menu = tk.OptionMenu(settings_frame, algorithm_var, "bubble_sort", "merge_sort", "selection_sort", "insertion_sort")
+algorithm_menu = tk.OptionMenu(settings_frame, algorithm_var, "bubble_sort", "merge_sort", "selection_sort", "insertion_sort", "gnome_sort", "cocktail_shaker_sort")
 algorithm_menu.pack(pady=5)
 
 # Add a horizontal separator
@@ -212,12 +299,15 @@ separator4.pack(fill='x', pady=5)
 
 # Create and place the run button
 run_button = tk.Button(settings_frame, text="Run", command=run_algorithm)
-run_button.pack(pady=20)
+run_button.pack(pady=5)
 
-# Configure the grid
-root.grid_columnconfigure(0, weight=3)
-root.grid_columnconfigure(1, weight=1)
-root.grid_rowconfigure(0, weight=1)
+# Add a horizontal separator
+separator5 = ttk.Separator(settings_frame, orient='horizontal')
+separator5.pack(fill='x', pady=5)
 
-# Start the Tkinter event loop
+# Create and place the reset button
+reset_button = tk.Button(settings_frame, text="Reset", command=reset_program)
+reset_button.pack(pady=5)
+
+# Start the Tkinter main loop
 root.mainloop()

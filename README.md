@@ -1,56 +1,40 @@
 <br />
 <div align="center">
   
-<h3 align="center">Sorting algorithms visualizer</h3>
+<h3 align="center">Sorting Algorithms Visualizer</h3>
 
   <p align="center">
-    Visualize sorting algorithms with interactive animations, gaining insights into their mechanics and performance.
+    This project implements a sorting algorithms visualizer using Python's Tkinter for the GUI. It allows users to visualize popular sorting algorithms step-by-step.
 </div>
 
 ## About The Project
-Explore the fascinating world of sorting algorithms through a dynamic and interactive visual experience. This program allows users to observe and understand how different sorting algorithms operate in real-time.
+The Sorting Algorithms Visualizer is designed to help users understand how 
+different sorting algorithms work by visualizing each step of the sorting process. 
+It includes various sorting algorithms like Bubble Sort, Merge Sort, Selection Sort 
+or Insertion Sort.
 
-**Key Features:**
+The project uses Python's Tkinter library for the graphical user interface (GUI), 
+providing interactive buttons and sliders to control the visualization parameters.
 
-* **Interactive Visualization:** Watch sorting algorithms such as Bubble Sort, Merge Sort, Quick Sort, Insertion Sort, and more, sorting arrays of numbers right before your eyes. Each step of the sorting process is visually represented, offering a clear demonstration of how algorithms rearrange elements.
+The source code is provided in the repository.
 
-* **Multiple Algorithms:** Choose from a selection of popular sorting algorithms. Compare their efficiency, understand their mechanics, and witness firsthand how they handle different types of data.
-
-* **Customizable Parameters:** Adjust parameters like array size, speed of visualization, and types of data to see how algorithms perform under different conditions.
-
-* **Educational Insights:** Gain insights into algorithm complexity, runtime performance, and best-case vs. worst-case scenarios. Learn about the trade-offs between different sorting methods and when each algorithm is most suitable.
-
-* **User-Friendly Interface:** Intuitive controls and an easy to understand interface make it easy for users of all levels to explore and comprehend sorting algorithms.
-
-* **Practical Learning Tool:** Ideal for students, developers, and anyone interested in computer science, offering a hands-on approach to understanding fundamental algorithms used in everyday computing tasks.
-
-<!--
-TEMPLATE for the future
 ## Usage
-To use the program
+The program can be run from the .py file as well as from .exe file (in dist 
+directory), which is recommended. After the window pops up, you can maximize it or 
+keep it in windowed mode. 
 
-![alt text](/images/image1.png)
+Steps to run the sorting algorithm: 
+* Specify the maximum value of the array to be sorted, then click `OK`, a value of 50 and 100 is recommended. Accepts values in range 3-1000 for performance reasons.
+* Select the sorting algorithms from the drop-down menu.
+* Click `Reversed` to reverse the array or `Random` (can be clicked multiple
+times) to randomize the values' positions.
+* Optionally - set the delay time (in miliseconds) on the slider to slow down the
+animation
+* Click `Run` to start the program. It is recommended to click `Reset` to start
+ again or stop the program prematurely.
 
-R
-
-![alt text](/images/image2.png)
-
-The
-
-## Prerequisites
-To run the program, a few packages are required:
-
-* numpy
-  ```sh
-  pip install numpy
-  ```
-* matplotlib
-  ```sh
-  pip install matplotlib
-  ```
+Program running on 50 numbers, using cocktail shaker sort:
+![alt text](/images/gif1.gif)
 
 
-## Acknowledgments
-
-The
 
