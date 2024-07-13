@@ -28,13 +28,11 @@ Steps to run the sorting algorithm:
 * Select the sorting algorithms from the drop-down menu.
 * Click `Reversed` to reverse the array or `Random` (can be clicked multiple
 times) to randomize the values' positions.
-* Optionally - set the delay time (in miliseconds) on the slider to slow down the
+* Optionally - set the delay time (in milliseconds) on the slider to slow down the
 animation
 * Click `Run` to start the program. It is recommended to click `Reset` to start
  again or stop the program prematurely.
 
 Program running on 50 numbers, using cocktail shaker sort:
 ![alt text](/images/gif1.gif)
-
-
 
